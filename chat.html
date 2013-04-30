@@ -200,47 +200,6 @@
 					
 				});
 
-               $('#send_button').click(function(event) {
-
-					event.preventDefault();
-				   if(document.getElementById('message').value) 
-				   {
-						ServerEvent();					   
-						showMessage(); // 메세지 출력 함수
-						scroll_bottom();
-						Incom_msg += 40;
-						$('#incomingMsg').height(Incom_msg);
-						document.getElementById('message').value='';
-					   
-				   return false;
-						
-				   }
-				   else
-				   {
-	    				 alert('메세지가 입력되지 않았습니다.');
-				   }
-				
-					   
-				 }); // button 클릭 메시지 전송
-
-				$("#message").bind("keyup",function(event){ 
-					if(event.which==13){
-						if(document.getElementById('message').value)  // 입력값이 있을경우
-						{	
-							ServerEvent();
-							showMessage();
-							scroll_bottom();
-							Incom_msg += 40;
-							$('#incomingMsg').height(Incom_msg);
-							document.getElementById('message').value='';
-						} 
-						else // 입력 값이 없을 경우 
-						{
-						 	alert('메세지가 입력되지 않았습니다.');
-						}
-				
-					}
-				}); // Enter 입력시 메시지 전송
 				
 				function ServerEvent() { // 서버 전송역할 함수 
 					socket.emit('message', { // server side 'message' Event 연결 
