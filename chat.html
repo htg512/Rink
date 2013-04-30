@@ -199,6 +199,28 @@
 					scroll_control();
 					
 				});
+  $('#send_button').click(function(event) {
+
+					event.preventDefault();
+				   if(document.getElementById('message').value) 
+				   {
+						ServerEvent();					   
+						showMessage(); // 메세지 출력 함수
+						scroll_bottom();
+						Incom_msg += 40;
+						$('#incomingMsg').height(Incom_msg);
+						document.getElementById('message').value='';
+					   
+				   return false;
+						
+				   }
+				   else
+				   {
+	    				 alert('메세지가 입력되지 않았습니다.');
+				   }
+				
+					   
+				 }); // button 클릭 메시지 전송
 
 				
 				function ServerEvent() { // 서버 전송역할 함수 
