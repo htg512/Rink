@@ -1,0 +1,314 @@
+        <!doctype html>
+        <html>
+        <head>
+        <meta charset="utf-8">
+        <meta name = "viewport" content = "width = device-width, user-scalable=no"/>
+        <link rel = "stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css"/>
+	    <style>
+      .msgContainerDiv
+      {
+        overflow-y:scroll;
+        height: 280px;
+      }
+	  #msg{		
+    	border-style:groove;
+		border-width:1px;
+		border-radius:5px;
+		border-color:#000;
+	  }
+    </style>
+        <script src = "/socket.io/socket.io.js"></script>
+        <script src = "http://code.jquery.com/jquery-1.7.1.js"></script>
+        <script src = "http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+        <script>
+				var socket = io.connect(); // 소켓 객체 생성
+				
+				var user_id = '';
+				var i = 0;
+				var j ;
+				var num1,num2;
+				var time =new Date();
+				var Y,M,D,H,m,S,date;
+				var chat_name = new Array();
+				var chat_msg = new Array();
+				var load_message='';;
+				var s_c = false;
+				var t = 0;
+				var Incom_msg = 30;
+				
+				function test() {
+				//접속 시간 전 의 데이터만 가져오기 
+					var qu = 'select *from message where date <' +" ' "+ date + " ' ";
+					socket.emit('test',qu);
+				};
+				
+				
+				function put(t) { 
+					load_message ='';
+					if(chat_name[j-t] == $Ruser_Name)
+					{
+						load_message += '<table id="msg" width="auto"align="right"> ';
+						load_message += '<td> ' + chat_msg[j-t] +'  </td>' + '</table> <br><br>';
+						$(load_message).prependTo('#incomingMsg');
+						Incom_msg += 40;
+						$('#incomingMsg').height(Incom_msg);
+					}
+					
+					else if (chat_name[j-t] == null || chat_msg[j-t]== null)
+					{
+						;
+					}
+
+					else
+					{
+						load_message += '<table id="msg" width="auto"> ' +  '<td> ';
+						load_message += chat_name[j-t] + '  : ' + chat_msg[j-t] +' </td>' + '</table><br><br>'; 
+						$(load_message).prependTo('#incomingMsg');
+						Incom_msg += 40;
+						$('#incomingMsg').height(Incom_msg);
+					}
+				};
+				
+				function scroll_control() {
+					s_c = true;
+					
+					if(s_c == true)
+					{
+						$(window).scroll( function() {
+						//무한 스크롤 함수 
+						var scrollHeight = $(window).scrollTop() ;
+						//$('#incomingMsg').scrollTop() 
+						if( $('#incomingMsg').scrollTop() < 20){
+								for(var x = 0; x<20;x ++)
+								{
+									if(chat_name[t] == null)
+										{
+											alert('데이터베이스의 끝, 더이상 불러올 채팅 내용 없음');
+											break;
+										} //if
+									else{
+										put(t);	
+										t++;
+										}//else
+								}//for
+							}//if
+						});//window.scroll
+
+					}//if
+					else
+					{
+						;
+					}
+				
+				}//scroll_controll function
+				
+				function scroll_bottom() {
+					//갑시 입력될때 마다의 스크롤 제어 함수
+					var scroll_size = $(window).scrollTop() + Incom_msg;
+					//스크롤의 이동 크기를 결정 
+					if(document.getElementById('incomingMsg').offsetHeight<150)
+					//자연스러운 이동을 위한 스크롤 범위 지정
+					{
+						window.scrollTo(0,10);
+						
+					}
+					else
+					{
+						window.scrollTo(0,scroll_size);
+					}
+					
+				//document.body.scrollHeight
+				}	
+					
+				function load_date() {  
+				//접속 시간 설정하는 함수 
+					Y = time.getFullYear(); //년도
+					M = time.getMonth()+1; //달
+					D = time.getDate(); //일
+					H = time.getHours(); //시
+					m = time.getMinutes(); //분
+					S = time.getSeconds();
+					date = Y+"-"+M+"-"+D+" "+H+":"+m+":"+S;
+					alert(date);
+				}
+				
+     		    function getCookie(Rink_User_Idinfo) { 
+				// 쿠키에 있는 링커의 아이디 뽑아오는 함수 
+				         
+				Rink_User_Idinfo = Rink_User_Idinfo + '=';       
+     			var cookieData = document.cookie;    
+			 	var start = cookieData.indexOf(Rink_User_Idinfo);   
+			    var cValue = '';     
+			      if(start != -1){        
+			       	 start += Rink_User_Idinfo.length;      
+				   		 var end = cookieData.indexOf(';', start);     
+			    			 if(end == -1)end = cookieData.length;    
+							      cValue = cookieData.substring(start, end);  
+					      }         
+					 return unescape(cValue);  
+				 }		
+				 
+         		function user_id_set(){ 
+				// 쿠키 뽑아내서 변수에 저장하는 함수 
+					$user_id = getCookie('Rink_User_Idinfo');
+					alert($user_id + '님이 접속하셨습니다');
+					
+				}
+
+            $(document).ready(function() {
+			
+				user_id_set();	// 시작하자마자 쿠키값 가져옴 
+                load_date();	// 시작하자마자 시간 셋팅 하기 위해 함수 로드 
+				test();
+					
+				var room = '';				
+				var out = '';	
+				
+				$('#message').click( function() {			
+					$('#incomingMsg').height(Incom_msg);
+					
+				});
+				
+				socket.on('redata', function(data) { 
+				// nodejs를 이용하여 mysql 에서 링커 이름 가져옴 
+					$Ruser_Name = data.Name;
+				});	
+				
+				socket.on('input_load',function(data) {
+					var load_message = '';
+					chat_name[i] = data.name;
+					chat_msg [i] = data.message;
+					i++;
+					j = i;
+		
+				});
+				
+				//클릭 함수 및 메세지 전송 관련 이벤트 
+						
+				$('#joinroom').click(function () { // 방 입장 시 nodejs에 mysql 이벤트 발생 
+					var R_room = document.getElementById('room_name').value;
+				
+					alert(R_room+'에 입장합니다.');
+					var te = 'select *from member_tb where ID='+"'"+$user_id+"'";
+					socket.emit('data_on',te);
+					room = '';
+					room = document.getElementById('room_name').value;
+					socket.emit('join',room);	
+					scroll_bottom();
+					$('#message').focus();
+					scroll_control();
+					
+				});
+
+               $('#send_button').click(function(event) {
+
+					event.preventDefault();
+				   if(document.getElementById('message').value) 
+				   {
+						ServerEvent();					   
+						showMessage(); // 메세지 출력 함수
+						scroll_bottom();
+						Incom_msg += 40;
+						$('#incomingMsg').height(Incom_msg);
+						document.getElementById('message').value='';
+					   
+				   return false;
+						
+				   }
+				   else
+				   {
+	    				 alert('메세지가 입력되지 않았습니다.');
+				   }
+				
+					   
+				 }); // button 클릭 메시지 전송
+
+				$("#message").bind("keyup",function(event){ 
+					if(event.which==13){
+						if(document.getElementById('message').value)  // 입력값이 있을경우
+						{	
+							ServerEvent();
+							showMessage();
+							scroll_bottom();
+							Incom_msg += 40;
+							$('#incomingMsg').height(Incom_msg);
+							document.getElementById('message').value='';
+						} 
+						else // 입력 값이 없을 경우 
+						{
+						 	alert('메세지가 입력되지 않았습니다.');
+						}
+				
+					}
+				}); // Enter 입력시 메시지 전송
+				
+				function ServerEvent() { // 서버 전송역할 함수 
+					socket.emit('message', { // server side 'message' Event 연결 
+	                        name : $Ruser_Name,
+    	                    message : $('#message').val()							
+						}); // 이름과 메세지 객체화해서 전달 
+					socket.emit('db_message',{
+							name : $Ruser_Name,
+							message : $('#message').val()
+					});
+						
+				}
+				
+				function showMessage() {
+						var output1 = '';
+				     	output1 += '<table id="msg" width="auto"align="right"> ' + '<td> ' + document.getElementById('message').value +' </td>' + '</table> <br><br>';
+				    	$(output1).appendTo('#incomingMsg');			
+						
+				} // 자기 자신이 보낸 메세지 출력 및 입력창 초기화 
+				
+				socket.on('message',function(data) {    
+				// app.js 의 message 이벤트 처리 함수
+				// 브로드캐스팅으로 인해서 전달되어온 메세지를 상대방에게 뿌려주는 곳 
+                    var output = ''; // 이전 데이터를 지우기 위해서 
+             	    output += '<table id="msg" width="auto"> ' +  '<td> ' + data.name + '  : ' + data.message +' </td>' + '</table> <br>';
+					// 닉네임과 메시지를 하나의 문장으로 만듬
+                    $(output).appendTo('#incomingMsg'); // main id에 출력 
+		
+                }); // socket.on socket받는 부분		
+				
+            });
+        
+        </script>
+        <meta charset="utf-8">
+        <title>Chatting !!!!</title>
+        </head>
+        
+        <body> 
+           <div data-role="page" id = "room">
+            	<div data-role="header">
+                	<h1> 방 만들기 / 입장 </h1>
+                 </div>
+            <div data-role = "content">
+            	<input type = "text" id = "room_name"/>
+                <a data-role = "button" href = "#chatpage" id = "joinroom"> Join </a>
+                </div>
+             </div>      
+             
+             
+                         
+        	<div data-role = "page" id = "chatpage">
+ 
+
+             <div data-role = "content" id = "main">
+				
+			 <div id="incomingMsg" name="incomingMsg" class="msgContainerDiv"></div>
+             
+             <label for="MessageTest"><strong>Message : </strong></label>
+             
+             <textarea name="message" id="message"></textarea>
+             
+             <fieldset class="ui-grid-a">
+             	<div class="ui-block-a"><a href="#" id="BackButton" data-role="button"> Back </a></div>
+                <div class="ui-block-b"><a href="#" id="send_button" name="send_button" data-role="button" data-theme="a"> Send </a> </div>
+             </fieldset>
+             
+             </div>
+
+           </div>
+        </body>
+        </html>
