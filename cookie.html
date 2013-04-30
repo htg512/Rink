@@ -1,0 +1,67 @@
+<?
+$_POST['uid'];
+$_POST['upw'];
+setcookie("Rink_User_Idinfo", $_POST['uid'], 0);
+setcookie("ck_pwd",$_POST['upw'], 0);
+$id = $_COOKIE['Rink_User_Idinfo'];
+$pwd = $_COOKIE['upw'];
+         $connect = mysql_connect('localhost','root','apmsetup');
+  if($connect)
+  mysql_query("SET NAMES utf8");
+  $m_db = mysql_select_db('member_db',$connect);
+
+  $result = mysql_query($sql, $connect);
+  $list = mysql_num_rows($result);
+?>
+<!doctype html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style>
+<div{
+	margin: 30px;
+	width: 500px;
+}
+#justify{
+	text-align:justify;
+}
+#center{
+	text-align: center;
+}
+</style>
+<title>무제 문서</title>
+</head>
+<body>
+<div id = "center">
+<?
+ 
+  $sql = "SELECT * FROM member_tb WHERE ID='{$_POST['uid']}' AND Pwd=old_password('{$_POST['upw']}')"; 
+  echo "true";  
+  $result = mysql_query($sql) or exit('에러!'); // 편의상 
+if ( !mysql_num_rows($result) ) { 
+$row = mysql_fetch_assoc($result); // 이용 
+echo "비밀번호가 틀립니다.<br />";
+ echo "<script>
+   alert('로그인 실패 \\r\\n 로그인으로 이동');
+   location.replace('login_form1.html');
+   </script>";
+  }
+  
+ 
+
+  
+ 
+  mysql_close($connect);
+?>
+<div data-role="content">
+<h2><? echo $row[Name]?>님 다음페이지 이동하세요.</h2>
+<? echo $Rink_User_Idinfo ?>
+<p><a href = "test.html"> 
+<input type = "button" value = "채팅방입장">
+</a>
+</p>
+</div>
+</div>
+</div>
+</body>
+</html>

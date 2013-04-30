@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=euc-kr" />
+<title>ajax_login</title>
+<script>
+    var xhr = null;
+    function getXMLHttpRequest() { // XMLHttpRequest 객체 얻기
+        if (window.ActiveXObject) {
+            try {
+                return new ActiveXObject("Msxml2.XMLHTTP"); //IE 상위 버젼
+            }
+            catch (e1) {
+                try {
+                    return new ActiveXObject("Microsoft.XMLHTTP"); //IE 하위 버젼
+                }
+                catch (e2) {
+                    return null;
+                }
+            }
+        }
+        else if (window.XMLHttpRequest) {
+            return new XMLHttpRequest(); //IE 이외의 브라우저(FireFox 등)
+        }
+        else {
+            return null;
+        }
+    } 
+
+    function ajaxSubmit() {
+	
+        xhr = getXMLHttpRequest();
+        xhr.onreadystatechange = ajaxResult;        //아래의 ajaxResult()를 호출
+        xhr.open("POST", "login1.php", true);    //POST방식으로 login.php를 호출
+        var postData = "uid=" + document.LoginForm.uid.value;        //POST로 넘길 파라미터들..
+        postData += "&upw=" + document.LoginForm.upw.value;
+        xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=euc-kr");
+        xhr.send(postData);
+    }    
+
+    function ajaxResult() {
+        if(xhr.readyState == 4) { //완료될경우
+            if(xhr.status == 200) { //오류없으면
+                var str = xhr.responseText; 
+                alert(str);    //서버에서 보낸 내용 받아서 alert
+            }
+            else {
+                alert("Fail : " + xhr.status);
+            }
+        }
+    }
+</script>
+</head>
+
+<body>
+
+<form name="LoginForm">
+<div>아이디 : <input type="text" name="uid"></div>
+<div>비밀번호 : <input type="password" name="upw"></div>
+<div><input type="button" value="로그인" onclick="javascript:ajaxSubmit()"></div>
+</form>
+
+</body>
+</html>
+[출처] ajax 로그인 (POST)|작성자 우iㅋi
