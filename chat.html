@@ -255,4 +255,41 @@
             });
         
         </script>
-   
+        <meta charset="utf-8">
+        <title>Chatting !!!!</title>
+        </head>
+        
+        <body> 
+           <div data-role="page" id = "room">
+            	<div data-role="header">
+                	<h1> 방 만들기 / 입장 </h1>
+                 </div>
+            <div data-role = "content">
+            	<input type = "text" id = "room_name"/>
+                <a data-role = "button" href = "#chatpage" id = "joinroom"> Join </a>
+                </div>
+             </div>      
+             
+             
+                         
+        	<div data-role = "page" id = "chatpage">
+ 
+
+             <div data-role = "content" id = "main">
+				
+			 <div id="incomingMsg" name="incomingMsg" class="msgContainerDiv"></div>
+             
+             <label for="MessageTest"><strong>Message : </strong></label>
+             
+             <textarea name="message" id="message"></textarea>
+             
+             <fieldset class="ui-grid-a">
+             	<div class="ui-block-a"><a href="#" id="BackButton" data-role="button"> Back </a></div>
+                <div class="ui-block-b"><a href="#" id="send_button" name="send_button" data-role="button" data-theme="a"> Send </a> </div>
+             </fieldset>
+             
+             </div>
+
+           </div>
+        </body>
+        </html>
